@@ -27,3 +27,6 @@ curl -I https://www.google.com
 ```
 > 输出如下，表示成功
 > HTTP/1.1 200 Connection established
+
+参考教程
+https://fanqiang.gitbook.io/fanqiang/linux
