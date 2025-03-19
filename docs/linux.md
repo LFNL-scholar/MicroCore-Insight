@@ -54,3 +54,9 @@ conda config --add channels https://mirrors.tuna.tsinghua.edu.cn/anaconda/cloud/
 ```bash
 pip install -r requirements.txt
 ```
+
+### 3. 系统相关
+看哪个进程（PID）占用了哪个端口
+```bash
+sudo ss -tulnp
+```
