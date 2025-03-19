@@ -32,3 +32,22 @@
 ## 联系方式
 - NULL
 
+针对MCU项目，按照项目难度来分
+针对Arduino的开发，
+1. 基于arduino IDE的开发
+2. 基于PlatformIO的开发
+
+针对ESP32的开发，
+1. 基于arduino软件的开发
+2. 基于PlatformIO的开发
+3. 基于ESP32 IDF的开发
+
+
+Linux项目
+> 待定
+
+
+
+
+
+
