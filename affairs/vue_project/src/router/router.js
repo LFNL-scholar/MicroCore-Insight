@@ -4,6 +4,7 @@ import LoginPage from '../pages/LoginPage.vue'
 import RegisterPage from '../pages/RegisterPage.vue'
 import SettingsPage from '../pages/SettingsPage.vue'
 import ConsolePage from '../pages/ConsolePage.vue'
+import RoleConfigPage from '../pages/RoleConfigPage.vue'
 
 const routes = [
   {
@@ -36,6 +37,12 @@ const routes = [
     path: '/console',
     name: 'Console',
     component: ConsolePage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/role-config/:deviceId',
+    name: 'RoleConfig',
+    component: RoleConfigPage,
     meta: { requiresAuth: true }
   }
 ]

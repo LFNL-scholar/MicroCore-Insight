@@ -13,10 +13,17 @@
       </div>
     </div>
     <div class="user-menu" @click="toggleDropdown" ref="userMenuRef">
+      <img src="../assets/user.png" alt="用户" class="user-icon">
       <span class="username">{{ username }}</span>
       <div class="dropdown-menu" v-show="isDropdownOpen">
-        <div class="dropdown-item" @click="goToSettings">账号设置</div>
-        <div class="dropdown-item" @click="logout">退出登录</div>
+        <div class="dropdown-item" @click="goToSettings">
+          <img src="../assets/setting.png" alt="设置" class="menu-icon">
+          账号设置
+        </div>
+        <div class="dropdown-item" @click="logout">
+          <img src="../assets/quit.png" alt="退出" class="menu-icon">
+          退出登录
+        </div>
       </div>
     </div>
   </nav>
@@ -146,6 +153,15 @@ export default {
   position: relative;
   cursor: pointer;
   padding: 8px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
 }
 
 .username {
@@ -169,9 +185,18 @@ export default {
   padding: 8px 16px;
   cursor: pointer;
   transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .dropdown-item:hover {
   background-color: #f5f5f5;
+}
+
+.menu-icon {
+  width: 15px;
+  height: 15px;
+  object-fit: contain;
 }
 </style>
