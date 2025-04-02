@@ -65,7 +65,25 @@
         <!-- 删除账号 -->
         <div v-show="activeTab === 'delete'" class="tab-pane danger-zone">
           <p class="warning-text">警告：此操作不可逆，账号删除后将无法恢复</p>
-          <button class="delete-button" @click="confirmDeleteAccount">删除账号</button>
+          <div class="form-group">
+            <label>请输入密码确认删除</label>
+            <input 
+              type="password" 
+              v-model="deletePassword" 
+              placeholder="请输入密码" 
+              :disabled="isDeleting"
+            />
+          </div>
+          <div v-if="deleteError" class="error-message">
+            {{ deleteError }}
+          </div>
+          <button 
+            class="delete-button" 
+            @click="confirmDeleteAccount"
+            :disabled="isDeleting"
+          >
+            {{ isDeleting ? '删除中...' : '删除账号' }}
+          </button>
         </div>
       </div>
     </div>
@@ -75,6 +93,7 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { deleteUser } from '../api/auth'
 
 export default {
   name: 'SettingsPage',
@@ -83,7 +102,7 @@ export default {
     const activeTab = ref('basic')
     
     // 基本信息
-    const accountName = ref('LFNL学者')
+    const accountName = ref(localStorage.getItem('userId') || '')
     const nickname = ref('小云')
     const email = ref('example@email.com')
     const phone = ref('+86185****7311')
@@ -91,6 +110,11 @@ export default {
     // 密码修改
     const newPassword = ref('')
     const confirmPassword = ref('')
+
+    // 删除账号
+    const deletePassword = ref('')
+    const deleteError = ref('')
+    const isDeleting = ref(false)
 
     const saveBasicInfo = async () => {
       try {
@@ -120,19 +144,40 @@ export default {
       }
     }
 
-    const confirmDeleteAccount = () => {
-      if (confirm('确定要删除账号吗？此操作不可恢复！')) {
-        deleteAccount()
+    const confirmDeleteAccount = async () => {
+      if (!deletePassword.value) {
+        deleteError.value = '请输入密码'
+        return
       }
-    }
 
-    const deleteAccount = async () => {
+      if (!confirm('确定要删除账号吗？此操作不可恢复！')) {
+        return
+      }
+
+      console.log('开始删除账号流程')
+      isDeleting.value = true
+      deleteError.value = ''
+
       try {
-        // 这里添加删除账号的逻辑
-        alert('账号已删除')
-        router.push('/login')
+        console.log('发送删除账号请求...')
+        const response = await deleteUser(accountName.value, deletePassword.value)
+        console.log('删除响应:', response)
+
+        if (response.status === 'success') {
+          console.log('账号删除成功，即将退出登录')
+          // 清除本地存储的用户信息
+          localStorage.removeItem('userId')
+          // 显示成功消息
+          alert('账号已成功删除')
+          // 跳转到登录页
+          router.push('/login')
+        }
       } catch (error) {
-        alert('删除失败：' + error.message)
+        console.error('删除失败:', error)
+        deleteError.value = error.message || '删除失败，请稍后重试'
+      } finally {
+        console.log('删除账号流程结束')
+        isDeleting.value = false
       }
     }
 
@@ -144,6 +189,9 @@ export default {
       phone,
       newPassword,
       confirmPassword,
+      deletePassword,
+      deleteError,
+      isDeleting,
       saveBasicInfo,
       updatePassword,
       confirmDeleteAccount
@@ -271,6 +319,12 @@ input::placeholder {
   margin-bottom: 1rem;
 }
 
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin: 0.5rem 0;
+}
+
 .delete-button {
   background-color: #dc3545;
   color: white;
@@ -280,9 +334,16 @@ input::placeholder {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 1rem;
 }
 
 .delete-button:hover {
   background-color: #c82333;
+}
+
+.delete-button:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
 }
 </style> 
