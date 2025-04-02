@@ -30,23 +30,32 @@
       <div class="tab-content">
         <!-- 基本信息 -->
         <div v-show="activeTab === 'basic'" class="tab-pane">
-          <div class="form-group">
-            <label>账号名</label>
-            <input type="text" v-model="accountName" disabled />
+          <div v-if="isLoading" class="loading-state">
+            加载中...
           </div>
-          <div class="form-group">
-            <label>昵称</label>
-            <input type="text" v-model="nickname" placeholder="请输入昵称" />
+          <div v-else-if="loadError" class="error-message">
+            {{ loadError }}
+            <button class="retry-button" @click="loadUserInfo">重试</button>
           </div>
-          <div class="form-group">
-            <label>邮箱</label>
-            <input type="email" v-model="email" placeholder="请输入邮箱" />
-          </div>
-          <div class="form-group">
-            <label>手机号</label>
-            <input type="tel" v-model="phone" placeholder="请输入手机号" />
-          </div>
-          <button class="save-button" @click="saveBasicInfo">保存修改</button>
+          <template v-else>
+            <div class="form-group">
+              <label>账号名</label>
+              <input type="text" v-model="accountName" disabled />
+            </div>
+            <div class="form-group">
+              <label>昵称</label>
+              <input type="text" v-model="nickname" placeholder="请输入昵称" />
+            </div>
+            <div class="form-group">
+              <label>邮箱</label>
+              <input type="email" v-model="email" placeholder="请输入邮箱" />
+            </div>
+            <div class="form-group">
+              <label>手机号</label>
+              <input type="tel" v-model="phone" placeholder="请输入手机号" />
+            </div>
+            <button class="save-button" @click="saveBasicInfo">保存修改</button>
+          </template>
         </div>
 
         <!-- 修改密码 -->
@@ -91,9 +100,10 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteUser } from '../api/auth'
+import { getUserInfo } from '../api/user'
 
 export default {
   name: 'SettingsPage',
@@ -103,9 +113,58 @@ export default {
     
     // 基本信息
     const accountName = ref(localStorage.getItem('userId') || '')
-    const nickname = ref('小云')
-    const email = ref('example@email.com')
-    const phone = ref('+86185****7311')
+    const nickname = ref('')
+    const email = ref('')
+    const phone = ref('')
+    const isLoading = ref(false)
+    const loadError = ref('')
+
+    // 加载用户信息
+    const loadUserInfo = async () => {
+      if (!accountName.value) {
+        loadError.value = '用户ID不存在，请重新登录'
+        return
+      }
+
+      isLoading.value = true
+      loadError.value = ''
+
+      try {
+        console.log('开始加载用户信息:', accountName.value)
+        const response = await getUserInfo(accountName.value)
+        console.log('用户信息加载成功:', response)
+
+        // 确保数据存在并赋值
+        if (response && response.status === 'success') {
+          nickname.value = response.nickname || ''
+          email.value = response.email || ''
+          phone.value = response.phone ? response.phone.toString() : ''
+          
+          // 打印赋值后的数据，用于调试
+          console.log('更新后的用户信息:', {
+            nickname: nickname.value,
+            email: email.value,
+            phone: phone.value
+          })
+        } else {
+          throw new Error('获取用户信息失败：返回数据格式不正确')
+        }
+      } catch (error) {
+        console.error('加载用户信息失败:', error)
+        loadError.value = error.message || '加载用户信息失败，请稍后重试'
+        if (error.status === 401) {
+          // 如果是未授权，跳转到登录页
+          router.push('/login')
+        }
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    // 在组件挂载时加载用户信息
+    onMounted(() => {
+      loadUserInfo()
+    })
 
     // 密码修改
     const newPassword = ref('')
@@ -166,7 +225,7 @@ export default {
         if (response.status === 'success') {
           console.log('账号删除成功，即将退出登录')
           // 清除本地存储的用户信息
-          localStorage.removeItem('userId')
+          localStorage.clear()
           // 显示成功消息
           alert('账号已成功删除')
           // 跳转到登录页
@@ -192,9 +251,12 @@ export default {
       deletePassword,
       deleteError,
       isDeleting,
+      isLoading,
+      loadError,
       saveBasicInfo,
       updatePassword,
-      confirmDeleteAccount
+      confirmDeleteAccount,
+      loadUserInfo
     }
   }
 }
@@ -345,5 +407,29 @@ input::placeholder {
 .delete-button:disabled {
   opacity: 0.65;
   cursor: not-allowed;
+}
+
+.loading-state {
+  text-align: center;
+  color: #666;
+  font-size: 1rem;
+  margin: 1rem 0;
+}
+
+.retry-button {
+  background-color: #313a7e;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 1rem;
+  width: fit-content;
+}
+
+.retry-button:hover {
+  background-color: #252d63;
 }
 </style> 
