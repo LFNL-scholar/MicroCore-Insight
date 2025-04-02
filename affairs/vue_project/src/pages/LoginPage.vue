@@ -6,9 +6,10 @@
         <div class="form-group">
           <input
             type="text"
-            v-model="username"
+            v-model="userId"
             placeholder="用户名"
             required
+            :disabled="isLoading"
           />
         </div>
         <div class="form-group">
@@ -17,9 +18,15 @@
             v-model="password"
             placeholder="密码"
             required
+            :disabled="isLoading"
           />
         </div>
-        <button type="submit" class="login-button">登录</button>
+        <div v-if="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+        <button type="submit" class="login-button" :disabled="isLoading">
+          {{ isLoading ? '登录中...' : '登录' }}
+        </button>
       </form>
       <div class="register-link">
         还没有账号？
@@ -32,28 +39,44 @@
 <script>
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { login } from '../api/auth'
 
 export default {
   name: 'LoginPage',
   setup() {
     const router = useRouter()
-    const username = ref('')
+    const userId = ref('')
     const password = ref('')
+    const errorMessage = ref('')
+    const isLoading = ref(false)
 
     const handleLogin = async () => {
-      // 这里添加登录逻辑
+      if (isLoading.value) return
+      
+      errorMessage.value = ''
+      isLoading.value = true
+      
       try {
-        // 模拟登录成功
-        console.log('登录成功')
-        router.push('/home')
+        const response = await login(userId.value, password.value)
+        
+        if (response.status === 'success') {
+          // 存储用户信息
+          localStorage.setItem('userId', response.user_id)
+          // 跳转到首页
+          router.push('/home')
+        }
       } catch (error) {
-        console.error('登录失败:', error)
+        errorMessage.value = error.message || '登录失败，请稍后重试'
+      } finally {
+        isLoading.value = false
       }
     }
 
     return {
-      username,
+      userId,
       password,
+      errorMessage,
+      isLoading,
       handleLogin
     }
   }
@@ -135,4 +158,21 @@ input:focus {
 .register-link a:hover {
   text-decoration: underline;
 }
-</style> 
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.login-button:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+input:disabled {
+  background-color: #e9ecef;
+  cursor: not-allowed;
+}
+</style>
