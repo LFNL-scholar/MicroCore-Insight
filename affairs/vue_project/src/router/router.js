@@ -3,6 +3,7 @@ import HomePage from '../pages/HomePage.vue'
 import LoginPage from '../pages/LoginPage.vue'
 import RegisterPage from '../pages/RegisterPage.vue'
 import SettingsPage from '../pages/SettingsPage.vue'
+import ConsolePage from '../pages/ConsolePage.vue'
 
 const routes = [
   {
@@ -29,6 +30,12 @@ const routes = [
     path: '/settings',
     name: 'Settings',
     component: SettingsPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/console',
+    name: 'Console',
+    component: ConsolePage,
     meta: { requiresAuth: true }
   }
 ]

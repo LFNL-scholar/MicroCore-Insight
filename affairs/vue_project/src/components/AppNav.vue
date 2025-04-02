@@ -1,6 +1,17 @@
 <template>
   <nav class="navbar">
-    <div class="navbar-brand" @click="goToHome"><b>小智AI</b></div>
+    <div class="nav-left">
+      <div class="navbar-brand" @click="goToHome"><b>小智AI</b></div>
+      <div class="nav-links">
+        <div 
+          class="nav-link" 
+          :class="{ active: isConsolePage }"
+          @click="goToConsole"
+        >
+          控制台
+        </div>
+      </div>
+    </div>
     <div class="user-menu" @click="toggleDropdown" ref="userMenuRef">
       <span class="username">{{ username }}</span>
       <div class="dropdown-menu" v-show="isDropdownOpen">
@@ -12,16 +23,21 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'AppNav',
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const username = ref('小云') 
     const isDropdownOpen = ref(false)
     const userMenuRef = ref(null)
+
+    const isConsolePage = computed(() => {
+      return route.name === 'Console'
+    })
 
     const toggleDropdown = () => {
       isDropdownOpen.value = !isDropdownOpen.value
@@ -29,6 +45,10 @@ export default {
 
     const goToHome = () => {
       router.push('/home')
+    }
+
+    const goToConsole = () => {
+      router.push('/console')
     }
 
     const goToSettings = () => {
@@ -61,8 +81,10 @@ export default {
       username,
       isDropdownOpen,
       userMenuRef,
+      isConsolePage,
       toggleDropdown,
       goToHome,
+      goToConsole,
       goToSettings,
       logout
     }
@@ -79,6 +101,14 @@ export default {
   height: 64px;
   background-color: #313a7e; 
   color: white;
+  position: relative;
+  z-index: 1000;
+}
+
+.nav-left {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
 }
 
 .navbar-brand {
@@ -90,6 +120,26 @@ export default {
 
 .navbar-brand:hover {
   opacity: 0.8;
+}
+
+.nav-links {
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-link {
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.nav-link:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.nav-link.active {
+  background-color: rgba(255, 255, 255, 0.2);
 }
 
 .user-menu {
@@ -111,6 +161,7 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   min-width: 120px;
   margin-top: 4px;
+  z-index: 1000;
 }
 
 .dropdown-item {
