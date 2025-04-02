@@ -103,7 +103,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteUser } from '../api/auth'
-import { getUserInfo } from '../api/user'
+import { getUserInfo, updateUserInfo } from '../api/user'
 
 export default {
   name: 'SettingsPage',
@@ -177,10 +177,46 @@ export default {
 
     const saveBasicInfo = async () => {
       try {
-        // 这里添加保存基本信息的逻辑
-        alert('基本信息保存成功')
+        // 表单验证
+        if (!nickname.value.trim()) {
+          alert('昵称不能为空')
+          return
+        }
+        if (!email.value.trim()) {
+          alert('邮箱不能为空')
+          return
+        }
+        if (!phone.value.trim()) {
+          alert('手机号不能为空')
+          return
+        }
+
+        // 显示加载状态
+        isLoading.value = true
+
+        // 准备更新数据
+        const updateData = {
+          user_id: accountName.value,
+          nickname: nickname.value.trim(),
+          email: email.value.trim(),
+          phone: phone.value.trim()
+        }
+
+        console.log('准备更新用户信息:', updateData)
+        const response = await updateUserInfo(updateData)
+        
+        if (response.status === 'success') {
+          alert('基本信息保存成功')
+          // 重新加载用户信息以确保数据同步
+          await loadUserInfo()
+        } else {
+          throw new Error(response.message || '更新失败')
+        }
       } catch (error) {
-        alert('保存失败：' + error.message)
+        console.error('保存失败:', error)
+        alert('保存失败：' + (error.message || '请稍后重试'))
+      } finally {
+        isLoading.value = false
       }
     }
 

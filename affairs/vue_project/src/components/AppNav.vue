@@ -32,19 +32,40 @@
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import { getUserInfo } from '../api/user'
 
 export default {
   name: 'AppNav',
   setup() {
     const router = useRouter()
     const route = useRoute()
-    const username = ref('小云') 
+    const username = ref('管理员')  // 默认显示"管理员"
     const isDropdownOpen = ref(false)
     const userMenuRef = ref(null)
 
     const isConsolePage = computed(() => {
       return route.name === 'Console'
     })
+
+    // 加载用户信息
+    const loadUserInfo = async () => {
+      try {
+        const userId = localStorage.getItem('userId')
+        if (!userId) {
+          console.log('未找到用户ID，使用默认昵称')
+          return
+        }
+
+        const response = await getUserInfo(userId)
+        if (response && response.status === 'success') {
+          username.value = response.nickname || '管理员'
+          console.log('已更新用户昵称:', username.value)
+        }
+      } catch (error) {
+        console.error('加载用户昵称失败:', error)
+        // 失败时保持默认昵称
+      }
+    }
 
     const toggleDropdown = () => {
       isDropdownOpen.value = !isDropdownOpen.value
@@ -66,7 +87,7 @@ export default {
     const logout = () => {
       isDropdownOpen.value = false
       // 清除用户登录状态
-      // localStorage.removeItem('token') // 如果有token的话
+      localStorage.clear()
       router.push('/login')
     }
 
@@ -78,6 +99,8 @@ export default {
 
     onMounted(() => {
       document.addEventListener('click', handleClickOutside)
+      // 组件挂载时加载用户信息
+      loadUserInfo()
     })
 
     onUnmounted(() => {
