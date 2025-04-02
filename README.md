@@ -19,10 +19,12 @@
 ## 目录结构
 ```
 /MicroCore-Insight
+├── affairs/       # 日常项目
 ├── docs/          # 学习笔记和文档
-├── projects/      # 练习项目代码
-├── scripts/       # 实用工具脚本
-├── references/    # 相关资料和推荐书籍
+├── Edge-AI/       # 端侧AI项目
+├── LFS-Web/       # LFS线上系统
+├── references/    # 相关资料和参考
+├── scripts/       # 工具脚本
 ├── README.md      # 项目说明
 ```
 
