@@ -10,6 +10,12 @@ export const bindDevice = async (code, userId) => {
     })
     
     console.log('Bind device response:', response.data)
+
+    // 验证响应格式
+    if (response.data.status !== 'success') {
+      throw new Error(response.data.message || '设备绑定失败')
+    }
+
     return response.data
   } catch (error) {
     // 增加更详细的错误日志
@@ -27,7 +33,16 @@ export const bindDevice = async (code, userId) => {
 
     // 处理特定的错误状态
     if (error.response?.status === 401) {
-      throw new Error('认证码错误，请检查后重试')
+      throw new Error(error.response.data.detail || '认证码错误')
+    }
+
+    if (error.response?.status === 500) {
+      throw new Error(error.response.data.detail || '服务器内部错误，请稍后重试')
+    }
+
+    // 处理其他错误
+    if (error.response?.data?.detail) {
+      throw new Error(error.response.data.detail)
     }
 
     handleApiError(error, 'bindDevice')

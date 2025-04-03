@@ -3,7 +3,7 @@
     <div class="dialog-content" @click.stop>
       <div class="dialog-header">
         <h3>添加设备</h3>
-        <button class="close-btn" @click="$emit('update:modelValue', false)">×</button>
+        <button class="close-btn" @click="handleClose">×</button>
       </div>
       <div class="dialog-body">
         <div class="form-group">
@@ -11,16 +11,27 @@
           <input 
             type="text" 
             v-model="authCode"
-            placeholder="请输入设备认证码"
+            placeholder="请输入6位设备认证码"
             :disabled="isLoading"
+            maxlength="6"
+            @keyup.enter="handleConfirm"
+            class="auth-code-input"
+            @input="handleInput"
           />
-          <div class="error-message" v-if="errorMessage">{{ errorMessage }}</div>
+          <div v-if="errorMessage" class="error-message">
+            <span class="error-icon">!</span>
+            {{ errorMessage }}
+          </div>
+          <div v-if="successMessage" class="success-message">
+            <span class="success-icon">✓</span>
+            {{ successMessage }}
+          </div>
         </div>
       </div>
       <div class="dialog-footer">
         <button 
           class="cancel-btn" 
-          @click="$emit('update:modelValue', false)"
+          @click="handleClose"
           :disabled="isLoading"
         >
           取消
@@ -28,9 +39,9 @@
         <button 
           class="confirm-btn" 
           @click="handleConfirm"
-          :disabled="isLoading"
+          :disabled="isLoading || !isValidCode"
         >
-          {{ isLoading ? '添加中...' : '确认添加' }}
+          {{ isLoading ? '验证中...' : '确认添加' }}
         </button>
       </div>
     </div>
@@ -38,7 +49,7 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 export default {
   name: 'AddDeviceDialog',
@@ -52,7 +63,46 @@ export default {
   setup(props, { emit }) {
     const authCode = ref('')
     const errorMessage = ref('')
+    const successMessage = ref('')
     const isLoading = ref(false)
+
+    // 验证码格式验证
+    const isValidCode = computed(() => {
+      return /^\d{6}$/.test(authCode.value)
+    })
+
+    // 处理输入，只允许数字
+    const handleInput = (event) => {
+      const value = event.target.value
+      // 移除非数字字符
+      authCode.value = value.replace(/\D/g, '')
+    }
+
+    // 监听输入变化，清除错误和成功消息
+    watch(authCode, () => {
+      errorMessage.value = ''
+      successMessage.value = ''
+    })
+
+    // 监听对话框关闭，重置状态
+    watch(() => props.modelValue, (newVal) => {
+      if (!newVal) {
+        resetState()
+      }
+    })
+
+    const resetState = () => {
+      authCode.value = ''
+      errorMessage.value = ''
+      successMessage.value = ''
+      isLoading.value = false
+    }
+
+    const handleClose = () => {
+      if (!isLoading.value) {
+        emit('update:modelValue', false)
+      }
+    }
 
     const handleOverlayClick = () => {
       if (!isLoading.value) {
@@ -67,17 +117,33 @@ export default {
         return
       }
 
+      if (!isValidCode.value) {
+        errorMessage.value = '请输入6位数字认证码'
+        return
+      }
+
       isLoading.value = true
       errorMessage.value = ''
+      successMessage.value = ''
 
       try {
         // 触发确认事件，将认证码传递给父组件
-        await emit('confirm', authCode.value.trim())
-        // 成功后关闭对话框
-        emit('update:modelValue', false)
-        // 清空输入
-        authCode.value = ''
+        const response = await emit('confirm', authCode.value.trim())
+        
+        // 只有在成功时才显示成功消息并关闭对话框
+        if (response && response.status === 'success') {
+          successMessage.value = '设备绑定成功！'
+          
+          // 1.5秒后关闭对话框
+          setTimeout(() => {
+            emit('update:modelValue', false)
+            resetState()
+          }, 1500)
+        } else {
+          throw new Error(response?.message || '添加设备失败')
+        }
       } catch (error) {
+        console.error('设备绑定失败:', error)
         errorMessage.value = error.message || '添加设备失败，请重试'
       } finally {
         isLoading.value = false
@@ -87,9 +153,13 @@ export default {
     return {
       authCode,
       errorMessage,
+      successMessage,
       isLoading,
+      isValidCode,
+      handleInput,
       handleOverlayClick,
-      handleConfirm
+      handleConfirm,
+      handleClose
     }
   }
 }
@@ -168,6 +238,18 @@ export default {
   font-size: 1rem;
 }
 
+.auth-code-input {
+  text-align: center;
+  letter-spacing: 2px;
+  font-family: Arial, sans-serif;
+}
+
+.auth-code-input::placeholder {
+  text-align: left;
+  letter-spacing: normal;
+  font-family: Arial, sans-serif;
+}
+
 .form-group input:focus {
   outline: none;
   border-color: #313a7e;
@@ -178,10 +260,45 @@ export default {
   cursor: not-allowed;
 }
 
-.error-message {
-  color: #dc3545;
+.error-message, .success-message {
   font-size: 0.875rem;
   margin-top: 0.5rem;
+  padding: 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.error-message {
+  color: #dc3545;
+  background-color: #fff5f5;
+}
+
+.success-message {
+  color: #28a745;
+  background-color: #f4faf6;
+}
+
+.error-icon, .success-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.error-icon {
+  background-color: #dc3545;
+  color: white;
+}
+
+.success-icon {
+  background-color: #28a745;
+  color: white;
 }
 
 .dialog-footer {
@@ -198,6 +315,7 @@ export default {
   cursor: pointer;
   font-size: 0.9rem;
   transition: all 0.2s;
+  min-width: 80px;
 }
 
 .cancel-btn {
@@ -216,7 +334,7 @@ export default {
   border: none;
 }
 
-.confirm-btn:hover {
+.confirm-btn:hover:not(:disabled) {
   background-color: #252d63;
 }
 

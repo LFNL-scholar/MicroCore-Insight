@@ -84,13 +84,12 @@ export default {
             lastActive: response.created_at,
             isOnline: true  // 新绑定的设备默认在线
           })
-          
-          // 显示成功消息
-          alert('设备绑定成功')
+          return response
         }
+        throw new Error(response.message || '添加设备失败')
       } catch (error) {
         console.error('添加设备失败:', error)
-        throw new Error(error.message || '添加设备失败，请稍后重试')
+        throw error
       }
     }
 
