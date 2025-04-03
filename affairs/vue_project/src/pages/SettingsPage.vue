@@ -61,14 +61,42 @@
         <!-- 修改密码 -->
         <div v-show="activeTab === 'password'" class="tab-pane">
           <div class="form-group">
+            <label>原密码</label>
+            <input 
+              type="password" 
+              v-model="oldPassword" 
+              placeholder="请输入原密码" 
+              :disabled="isLoading"
+            />
+          </div>
+          <div class="form-group">
             <label>新密码</label>
-            <input type="password" v-model="newPassword" placeholder="请输入新密码" />
+            <input 
+              type="password" 
+              v-model="newPassword" 
+              placeholder="请输入新密码" 
+              :disabled="isLoading"
+            />
           </div>
           <div class="form-group">
             <label>确认密码</label>
-            <input type="password" v-model="confirmPassword" placeholder="请再次输入新密码" />
+            <input 
+              type="password" 
+              v-model="confirmPassword" 
+              placeholder="请再次输入新密码" 
+              :disabled="isLoading"
+            />
           </div>
-          <button class="save-button" @click="updatePassword">更新密码</button>
+          <div v-if="passwordError" class="error-message">
+            {{ passwordError }}
+          </div>
+          <button 
+            class="save-button" 
+            @click="updatePassword"
+            :disabled="isLoading"
+          >
+            {{ isLoading ? '更新中...' : '更新密码' }}
+          </button>
         </div>
 
         <!-- 删除账号 -->
@@ -167,8 +195,10 @@ export default {
     })
 
     // 密码修改
+    const oldPassword = ref('')
     const newPassword = ref('')
     const confirmPassword = ref('')
+    const passwordError = ref('')
 
     // 删除账号
     const deletePassword = ref('')
@@ -221,21 +251,45 @@ export default {
     }
 
     const updatePassword = async () => {
+      if (oldPassword.value.length < 6) {
+        passwordError.value = '原密码长度不能少于6位'
+        return
+      }
       if (newPassword.value !== confirmPassword.value) {
-        alert('两次输入的密码不一致')
+        passwordError.value = '两次输入的密码不一致'
         return
       }
       if (newPassword.value.length < 6) {
-        alert('密码长度不能少于6位')
+        passwordError.value = '新密码长度不能少于6位'
         return
       }
+
+      // 清除错误信息
+      passwordError.value = ''
+      isLoading.value = true
+
       try {
-        // 这里添加更新密码的逻辑
-        alert('密码更新成功')
-        newPassword.value = ''
-        confirmPassword.value = ''
+        console.log('开始更新密码...')
+        const response = await updatePassword(
+          accountName.value,
+          oldPassword.value,
+          newPassword.value
+        )
+
+        if (response.status === 'success') {
+          alert('密码更新成功')
+          // 清空输入框
+          oldPassword.value = ''
+          newPassword.value = ''
+          confirmPassword.value = ''
+        } else {
+          throw new Error(response.message || '密码更新失败')
+        }
       } catch (error) {
-        alert('密码更新失败：' + error.message)
+        console.error('密码更新失败:', error)
+        passwordError.value = error.message || '密码更新失败，请稍后重试'
+      } finally {
+        isLoading.value = false
       }
     }
 
@@ -282,6 +336,7 @@ export default {
       nickname,
       email,
       phone,
+      oldPassword,
       newPassword,
       confirmPassword,
       deletePassword,
@@ -289,6 +344,7 @@ export default {
       isDeleting,
       isLoading,
       loadError,
+      passwordError,
       saveBasicInfo,
       updatePassword,
       confirmDeleteAccount,

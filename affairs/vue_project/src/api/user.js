@@ -29,14 +29,14 @@ export const getUserInfo = async (userId) => {
 export const updateUserInfo = async (userData) => {
   try {
     console.log('Updating user info:', userData)
-    const response = await api.post('/api/frontend/user/update', userData)
+    const response = await api.put('/api/frontend/user/update', userData)
     
     console.log('Update response:', response.data)
     return response.data
   } catch (error) {
     // 增加更详细的错误日志
     console.error('Update user info error:', {
-      method: 'POST',
+      method: 'PUT',
       url: '/api/frontend/user/update',
       data: userData,
       error: {
