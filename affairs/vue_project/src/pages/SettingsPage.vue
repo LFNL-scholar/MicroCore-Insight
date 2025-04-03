@@ -131,7 +131,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { deleteUser } from '../api/auth'
-import { getUserInfo, updateUserInfo } from '../api/user'
+import { getUserInfo, updateUserInfo, updateUserPassword } from '../api/user'
 
 export default {
   name: 'SettingsPage',
@@ -251,8 +251,13 @@ export default {
     }
 
     const updatePassword = async () => {
-      if (oldPassword.value.length < 6) {
-        passwordError.value = '原密码长度不能少于6位'
+      // 表单验证
+      if (!oldPassword.value.trim()) {
+        passwordError.value = '请输入原密码'
+        return
+      }
+      if (!newPassword.value.trim()) {
+        passwordError.value = '请输入新密码'
         return
       }
       if (newPassword.value !== confirmPassword.value) {
@@ -263,6 +268,10 @@ export default {
         passwordError.value = '新密码长度不能少于6位'
         return
       }
+      if (oldPassword.value === newPassword.value) {
+        passwordError.value = '新密码不能与原密码相同'
+        return
+      }
 
       // 清除错误信息
       passwordError.value = ''
@@ -270,24 +279,34 @@ export default {
 
       try {
         console.log('开始更新密码...')
-        const response = await updatePassword(
-          accountName.value,
-          oldPassword.value,
-          newPassword.value
+        const response = await updateUserPassword(
+          accountName.value.trim(),
+          oldPassword.value.trim(),
+          newPassword.value.trim()
         )
 
+        console.log('密码更新响应:', response)
+
         if (response.status === 'success') {
-          alert('密码更新成功')
+          alert('密码修改成功')
           // 清空输入框
           oldPassword.value = ''
           newPassword.value = ''
           confirmPassword.value = ''
+          // 清除错误信息
+          passwordError.value = ''
         } else {
-          throw new Error(response.message || '密码更新失败')
+          throw new Error(response.message || '密码修改失败')
         }
       } catch (error) {
-        console.error('密码更新失败:', error)
-        passwordError.value = error.message || '密码更新失败，请稍后重试'
+        console.error('密码修改失败:', error)
+        if (error.response?.status === 422) {
+          passwordError.value = '请求格式不正确，请检查输入数据'
+        } else if (error.response?.status === 400) {
+          passwordError.value = '原密码错误，请重新输入'
+        } else {
+          passwordError.value = error.message || '密码修改失败，请稍后重试'
+        }
       } finally {
         isLoading.value = false
       }
