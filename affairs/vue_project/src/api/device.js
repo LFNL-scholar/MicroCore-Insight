@@ -1,5 +1,37 @@
 import api, { handleApiError } from './request'
 
+// 获取用户设备列表
+export const getUserDevices = async (userId) => {
+  try {
+    console.log('Fetching devices for user:', userId)
+    const response = await api.get('/api/frontend/user/devices', {
+      params: { user_id: userId }
+    })
+    
+    console.log('Get user devices response:', response.data)
+    return response.data
+  } catch (error) {
+    // 增加更详细的错误日志
+    console.error('Get user devices error:', {
+      method: 'GET',
+      url: '/api/frontend/user/devices',
+      params: { user_id: userId },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+
+    if (error.response?.status === 404) {
+      throw new Error('用户不存在')
+    }
+
+    handleApiError(error, 'getUserDevices')
+  }
+}
+
 // 绑定设备
 export const bindDevice = async (code, userId) => {
   try {

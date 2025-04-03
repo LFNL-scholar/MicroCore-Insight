@@ -19,7 +19,9 @@
         </div>
         <div class="info-item">
           <span class="label">最近活跃:</span>
-          <span class="value">{{ lastActive }}</span>
+          <span class="value" :class="{ 'active-now': isOnline }">
+            {{ isOnline ? '正在活跃' : lastActive }}
+          </span>
         </div>
       </div>
       <div class="card-actions">
@@ -132,6 +134,11 @@ export default {
 
 .info-item .value {
   color: #333;
+}
+
+.info-item .value.active-now {
+  color: #4caf50;
+  font-weight: 500;
 }
 
 .card-actions {
