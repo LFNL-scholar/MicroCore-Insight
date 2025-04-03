@@ -5,6 +5,7 @@ import RegisterPage from '../pages/RegisterPage.vue'
 import SettingsPage from '../pages/SettingsPage.vue'
 import ConsolePage from '../pages/ConsolePage.vue'
 import RoleConfigPage from '../pages/RoleConfigPage.vue'
+import DeviceDetailPage from '../pages/DeviceDetailPage.vue'
 
 const routes = [
   {
@@ -43,6 +44,12 @@ const routes = [
     path: '/role-config/:deviceId',
     name: 'RoleConfig',
     component: RoleConfigPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/device/:deviceId',
+    name: 'DeviceDetail',
+    component: DeviceDetailPage,
     meta: { requiresAuth: true }
   }
 ]

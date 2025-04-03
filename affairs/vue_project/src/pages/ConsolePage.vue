@@ -29,6 +29,7 @@
           :is-online="device.status === 1"
           @config-role="handleConfigRole"
           @view-history="handleViewHistory"
+          @update-name="handleUpdateDeviceName"
         />
       </div>
     </div>
@@ -46,7 +47,7 @@ import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import DeviceCard from '../components/DeviceCard.vue'
 import AddDeviceDialog from '../components/AddDeviceDialog.vue'
-import { bindDevice, getUserDevices } from '../api/device'
+import { bindDevice, getUserDevices, updateDeviceName } from '../api/device'
 
 export default {
   name: 'ConsolePage',
@@ -119,6 +120,21 @@ export default {
       console.log('查看历史对话', deviceId)
     }
 
+    const handleUpdateDeviceName = async ({ deviceId, newName }) => {
+      try {
+        await updateDeviceName(deviceId, newName)
+        // 更新本地设备列表中的设备名称
+        const deviceIndex = devices.value.findIndex(d => d.device_id === deviceId)
+        if (deviceIndex !== -1) {
+          devices.value[deviceIndex].device_name = newName
+        }
+        return true
+      } catch (error) {
+        console.error('Failed to update device name:', error)
+        throw new Error('更新设备昵称失败，请重试')
+      }
+    }
+
     // 组件挂载时加载设备列表
     onMounted(() => {
       loadDevices()
@@ -132,6 +148,7 @@ export default {
       handleAddDeviceConfirm,
       handleConfigRole,
       handleViewHistory,
+      handleUpdateDeviceName,
       loadDevices
     }
   }
@@ -172,8 +189,9 @@ export default {
 
 .device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1.5rem;
+  padding: 0.5rem;
 }
 
 .loading-state {
@@ -221,6 +239,7 @@ export default {
 
   .device-grid {
     grid-template-columns: 1fr;
+    gap: 1rem;
   }
 }
 </style> 

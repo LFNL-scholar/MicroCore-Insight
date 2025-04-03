@@ -80,3 +80,67 @@ export const bindDevice = async (code, userId) => {
     handleApiError(error, 'bindDevice')
   }
 }
+
+/**
+ * 更新设备昵称
+ * @param {string|number} deviceId - 设备ID
+ * @param {string} newName - 新的设备昵称
+ * @returns {Promise<Object>} - 更新结果
+ */
+export async function updateDeviceName(deviceId, newName) {
+  try {
+    const response = await api.put(`/api/device/${deviceId}/name`, {
+      name: newName
+    })
+
+    if (response.data.status === 'success') {
+      return response.data
+    }
+
+    throw new Error(response.data.message || '更新设备昵称失败')
+  } catch (error) {
+    console.error('Update device name error:', {
+      method: 'PUT',
+      url: `/api/device/${deviceId}/name`,
+      data: { name: newName },
+      error
+    })
+    throw error
+  }
+}
+
+/**
+ * 获取设备详细信息
+ * @param {string|number} deviceId - 设备ID
+ * @returns {Promise<Object>} - 设备详细信息
+ */
+export async function getDeviceDetail(deviceId) {
+  try {
+    const response = await api.get(`/api/frontend/device/${deviceId}`)
+    
+    console.log('Get device detail response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '获取设备详情失败')
+  } catch (error) {
+    console.error('Get device detail error:', {
+      method: 'GET',
+      url: `/api/frontend/device/${deviceId}`,
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+    
+    if (error.response?.status === 404) {
+      throw new Error('设备不存在')
+    }
+    
+    handleApiError(error, 'getDeviceDetail')
+  }
+}

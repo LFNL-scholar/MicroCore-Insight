@@ -25,16 +25,32 @@
         </div>
       </div>
       <div class="card-actions">
+        <button class="action-btn" @click="showEditNameDialog = true">修改昵称</button>
         <button class="action-btn" @click="$emit('config-role', deviceId)">配置角色</button>
         <button class="action-btn" @click="$emit('view-history', deviceId)">历史对话</button>
+        <button class="action-btn" @click="handleViewDetail">详细信息</button>
       </div>
     </div>
+
+    <!-- 修改昵称对话框 -->
+    <EditDeviceNameDialog
+      v-model="showEditNameDialog"
+      :current-name="deviceName"
+      @confirm="handleEditName"
+    />
   </div>
 </template>
 
 <script>
+import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import EditDeviceNameDialog from './EditDeviceNameDialog.vue'
+
 export default {
   name: 'DeviceCard',
+  components: {
+    EditDeviceNameDialog
+  },
   props: {
     deviceId: {
       type: [String, Number],
@@ -57,7 +73,34 @@ export default {
       default: false
     }
   },
-  emits: ['config-role', 'view-history']
+  emits: ['config-role', 'view-history', 'update-name'],
+  setup(props, { emit }) {
+    const router = useRouter()
+    const showEditNameDialog = ref(false)
+
+    const handleViewDetail = () => {
+      router.push(`/device/${props.deviceId}`)
+    }
+
+    const handleEditName = async (newName) => {
+      try {
+        // 触发更新昵称事件
+        await emit('update-name', {
+          deviceId: props.deviceId,
+          newName: newName
+        })
+        return true
+      } catch (error) {
+        throw error
+      }
+    }
+
+    return {
+      showEditNameDialog,
+      handleEditName,
+      handleViewDetail
+    }
+  }
 }
 </script>
 
@@ -68,10 +111,16 @@ export default {
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  min-width: 320px;
 }
 
 .status-bar {
-  width: 6px;
+  width: 4px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
 }
 
 .status-bar.online {
@@ -84,14 +133,15 @@ export default {
 
 .card-content {
   flex: 1;
-  padding: 1rem;
+  padding: 0.75rem 1rem;
+  padding-left: calc(1rem + 4px);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .device-name {
@@ -117,12 +167,12 @@ export default {
 }
 
 .device-info {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .info-item {
   display: flex;
-  margin-bottom: 0.4rem;
+  margin-bottom: 0.25rem;
   font-size: 0.9rem;
 }
 
@@ -144,20 +194,23 @@ export default {
 .card-actions {
   display: flex;
   gap: 0.5rem;
-  justify-content: flex-start;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .action-btn {
-  padding: 0.35rem 0.75rem;
+  padding: 0.35rem 0.5rem;
   border: 1px solid #313a7e;
   border-radius: 4px;
   background: white;
   color: #313a7e;
   cursor: pointer;
   transition: all 0.2s;
-  font-size: 0.85rem;
-  flex: 0 1 auto;
+  font-size: 0.8rem;
   white-space: nowrap;
+  flex: 1;
+  text-align: center;
+  min-width: 0;
 }
 
 .action-btn:hover {
@@ -173,6 +226,14 @@ export default {
   .info-item .label {
     width: auto;
     margin-bottom: 0.25rem;
+  }
+
+  .card-actions {
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    flex: 1 1 calc(50% - 0.25rem);
   }
 }
 </style> 
