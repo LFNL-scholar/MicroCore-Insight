@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
-      © 2025 云问科技 小智 AI 控制面板
+      © 2025 LFNL科技 小智 AI 控制面板
     </div>
   </footer>
 </template>
