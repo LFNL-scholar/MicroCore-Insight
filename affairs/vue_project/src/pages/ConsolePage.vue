@@ -1,7 +1,7 @@
 <template>
   <div class="console-container">
     <div class="header-actions">
-      <button class="add-device-btn" @click="handleAddDevice">
+      <button class="add-device-btn" @click="showAddDialog = true">
         <span class="plus-icon">+</span>
         添加设备
       </button>
@@ -21,6 +21,12 @@
         @view-history="handleViewHistory"
       />
     </div>
+
+    <!-- 添加设备对话框 -->
+    <AddDeviceDialog
+      v-model="showAddDialog"
+      @confirm="handleAddDeviceConfirm"
+    />
   </div>
 </template>
 
@@ -28,14 +34,18 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import DeviceCard from '../components/DeviceCard.vue'
+import AddDeviceDialog from '../components/AddDeviceDialog.vue'
+import { bindDevice } from '../api/device'
 
 export default {
   name: 'ConsolePage',
   components: {
-    DeviceCard
+    DeviceCard,
+    AddDeviceDialog
   },
   setup() {
     const router = useRouter()
+    const showAddDialog = ref(false)
     
     // 模拟设备数据
     const devices = ref([
@@ -55,9 +65,33 @@ export default {
       }
     ])
 
-    const handleAddDevice = () => {
-      // 处理添加设备的逻辑
-      console.log('添加设备')
+    const handleAddDeviceConfirm = async (authCode) => {
+      try {
+        const userId = localStorage.getItem('userId')
+        if (!userId) {
+          throw new Error('用户未登录，请重新登录')
+        }
+
+        console.log('添加设备，认证码:', authCode)
+        const response = await bindDevice(authCode, userId)
+        
+        if (response.status === 'success') {
+          // 添加新设备到列表
+          devices.value.unshift({
+            deviceId: response.device_id,
+            deviceName: '新设备',  // 可以后续允许用户修改设备昵称
+            macAddress: response.mac_address,
+            lastActive: response.created_at,
+            isOnline: true  // 新绑定的设备默认在线
+          })
+          
+          // 显示成功消息
+          alert('设备绑定成功')
+        }
+      } catch (error) {
+        console.error('添加设备失败:', error)
+        throw new Error(error.message || '添加设备失败，请稍后重试')
+      }
     }
 
     const handleConfigRole = (deviceId) => {
@@ -71,7 +105,8 @@ export default {
 
     return {
       devices,
-      handleAddDevice,
+      showAddDialog,
+      handleAddDeviceConfirm,
       handleConfigRole,
       handleViewHistory
     }
