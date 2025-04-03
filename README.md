@@ -20,4 +20,4 @@
 ## 联系
 - 如果你也想一起学习，研究，开发，欢迎加入我的群聊。
 
-![微信二维码](docs/images/wechat.png)
+<img src="docs/images/wechat.png" alt="微信二维码" width="300">
