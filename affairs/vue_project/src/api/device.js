@@ -84,39 +84,68 @@ export const bindDevice = async (code, userId) => {
 /**
  * 更新设备昵称
  * @param {string|number} deviceId - 设备ID
- * @param {string} newName - 新的设备昵称
+ * @param {string} deviceName - 新的设备昵称
+ * @param {string} userId - 用户ID
  * @returns {Promise<Object>} - 更新结果
  */
-export async function updateDeviceName(deviceId, newName) {
+export async function updateDeviceName(deviceId, deviceName, userId) {
   try {
-    const response = await api.put(`/api/device/${deviceId}/name`, {
-      name: newName
+    const response = await api.put('/api/frontend/device/update', {
+      user_id: userId,
+      device_4id: deviceId,
+      device_name: deviceName
     })
-
+    
+    console.log('Update device name response:', response.data)
+    
     if (response.data.status === 'success') {
       return response.data
     }
-
+    
     throw new Error(response.data.message || '更新设备昵称失败')
   } catch (error) {
     console.error('Update device name error:', {
       method: 'PUT',
-      url: `/api/device/${deviceId}/name`,
-      data: { name: newName },
-      error
+      url: '/api/frontend/device/update',
+      data: {
+        user_id: userId,
+        device_4id: deviceId,
+        device_name: deviceName
+      },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
     })
-    throw error
+
+    if (error.response?.status === 400) {
+      throw new Error('参数缺失，请检查输入')
+    }
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'updateDeviceName')
   }
 }
 
 /**
  * 获取设备详细信息
  * @param {string|number} deviceId - 设备ID
+ * @param {string} userId - 用户ID
  * @returns {Promise<Object>} - 设备详细信息
  */
-export async function getDeviceDetail(deviceId) {
+export async function getDeviceDetail(deviceId, userId) {
   try {
-    const response = await api.get(`/api/frontend/device/${deviceId}`)
+    const response = await api.get('/api/frontend/device/info', {
+      params: {
+        user_id: userId,
+        device_4id: deviceId.toString()
+      }
+    })
     
     console.log('Get device detail response:', response.data)
     
@@ -128,7 +157,11 @@ export async function getDeviceDetail(deviceId) {
   } catch (error) {
     console.error('Get device detail error:', {
       method: 'GET',
-      url: `/api/frontend/device/${deviceId}`,
+      url: '/api/frontend/device/info',
+      params: {
+        user_id: userId,
+        device_4id: deviceId
+      },
       error: {
         message: error.message,
         status: error.response?.status,
@@ -141,6 +174,60 @@ export async function getDeviceDetail(deviceId) {
       throw new Error('设备不存在')
     }
     
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
     handleApiError(error, 'getDeviceDetail')
+  }
+}
+
+/**
+ * 删除设备
+ * @param {string} userId - 用户ID
+ * @param {string} macAddress - 设备MAC地址
+ * @returns {Promise<Object>} - 删除结果
+ */
+export async function deleteDevice(userId, macAddress) {
+  try {
+    const response = await api.delete('/api/frontend/user/delete', {
+      data: {
+        user_id: userId,
+        mac_address: macAddress
+      }
+    })
+    
+    console.log('Delete device response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '删除设备失败')
+  } catch (error) {
+    console.error('Delete device error:', {
+      method: 'DELETE',
+      url: '/api/frontend/user/delete',
+      data: {
+        user_id: userId,
+        mac_address: macAddress
+      },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+
+    if (error.response?.status === 404) {
+      throw new Error('设备不存在')
+    }
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'deleteDevice')
   }
 }

@@ -57,8 +57,8 @@ export default {
       required: true
     },
     currentName: {
-      type: String,
-      required: true
+      type: [String, null],
+      default: '未命名设备'
     }
   },
   emits: ['update:modelValue', 'confirm'],

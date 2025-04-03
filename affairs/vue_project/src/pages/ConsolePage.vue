@@ -122,7 +122,12 @@ export default {
 
     const handleUpdateDeviceName = async ({ deviceId, newName }) => {
       try {
-        await updateDeviceName(deviceId, newName)
+        const userId = localStorage.getItem('userId')
+        if (!userId) {
+          throw new Error('用户未登录，请重新登录')
+        }
+
+        await updateDeviceName(deviceId, newName, userId)
         // 更新本地设备列表中的设备名称
         const deviceIndex = devices.value.findIndex(d => d.device_id === deviceId)
         if (deviceIndex !== -1) {
@@ -131,7 +136,7 @@ export default {
         return true
       } catch (error) {
         console.error('Failed to update device name:', error)
-        throw new Error('更新设备昵称失败，请重试')
+        throw error
       }
     }
 

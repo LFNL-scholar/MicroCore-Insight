@@ -3,7 +3,9 @@
     <div :class="['status-bar', isOnline ? 'online' : 'offline']"></div>
     <div class="card-content">
       <div class="card-header">
-        <h3 class="device-name">{{ deviceName }}</h3>
+        <h3 class="device-name" :class="{ 'unnamed': !deviceName || deviceName === '未命名设备' }">
+          {{ deviceName || '未命名设备' }}
+        </h3>
         <span :class="['status-text', isOnline ? 'online' : 'offline']">
           {{ isOnline ? '在线' : '离线' }}
         </span>
@@ -35,7 +37,7 @@
     <!-- 修改昵称对话框 -->
     <EditDeviceNameDialog
       v-model="showEditNameDialog"
-      :current-name="deviceName"
+      :current-name="deviceName || '未命名设备'"
       @confirm="handleEditName"
     />
   </div>
@@ -57,8 +59,8 @@ export default {
       required: true
     },
     deviceName: {
-      type: String,
-      default: '未命名设备'
+      type: [String, null],
+      default: null
     },
     macAddress: {
       type: String,
@@ -148,6 +150,10 @@ export default {
   margin: 0;
   font-size: 1.1rem;
   color: #333;
+}
+
+.device-name.unnamed {
+  color: #999;
 }
 
 .status-text {
