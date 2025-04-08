@@ -116,8 +116,7 @@ export default {
     }
 
     const handleViewHistory = (deviceId) => {
-      // 处理查看历史对话的逻辑
-      console.log('查看历史对话', deviceId)
+      router.push(`/chat-history/${deviceId}`)
     }
 
     const handleUpdateDeviceName = async ({ deviceId, newName }) => {

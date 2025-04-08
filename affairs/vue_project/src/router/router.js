@@ -6,6 +6,7 @@ import SettingsPage from '../pages/SettingsPage.vue'
 import ConsolePage from '../pages/ConsolePage.vue'
 import RoleConfigPage from '../pages/RoleConfigPage.vue'
 import DeviceDetailPage from '../pages/DeviceDetailPage.vue'
+import ChatHistoryPage from '../pages/ChatHistoryPage.vue'
 
 const routes = [
   {
@@ -50,6 +51,12 @@ const routes = [
     path: '/device/:deviceId',
     name: 'DeviceDetail',
     component: DeviceDetailPage,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/chat-history/:deviceId',
+    name: 'ChatHistory',
+    component: ChatHistoryPage,
     meta: { requiresAuth: true }
   }
 ]
