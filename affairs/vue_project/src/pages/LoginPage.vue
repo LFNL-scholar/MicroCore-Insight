@@ -1,7 +1,7 @@
 <template>
   <div class="login-container">
     <div class="login-box">
-      <h2>端侧AI控制面板</h2>
+      <h2>小智AI控制面板</h2>
       <form @submit.prevent="handleLogin" class="login-form">
         <div class="form-group">
           <input

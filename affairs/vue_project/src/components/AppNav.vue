@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="nav-left">
-      <div class="navbar-brand" @click="goToHome"><b>端侧AI</b></div>
+      <div class="navbar-brand" @click="goToHome"><b>小智AI</b></div>
       <div class="nav-links">
         <div 
           class="nav-link" 
