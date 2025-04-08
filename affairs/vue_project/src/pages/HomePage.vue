@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="welcome-container">
-      <h1 class="welcome-text">欢迎使用小智AI管理系统</h1>
+      <h1 class="welcome-text">欢迎使用端侧AI管理系统</h1>
       <div class="welcome-subtitle">AI智能体</div>
     </div>
   </div>

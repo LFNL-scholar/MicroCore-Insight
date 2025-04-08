@@ -49,6 +49,7 @@
         <template v-if="selectedChat">
           <div class="panel-header">
             <span class="chat-time">{{ formatDateTime(selectedChat.created_at) }}</span>
+            <span class="session-id">会话ID: {{ selectedChat.session_id }}</span>
           </div>
           <div class="messages-container">
             <div class="message-wrapper">
@@ -152,31 +153,35 @@ export default {
         chatHistory.value = [
           {
             id: 1,
+            session_id: '550e8400-e29b-41d4-a716-446655440000',
             created_at: '2024-03-21 09:15:00',
             user_message: '你好，今天天气怎么样？',
             assistant_message: '根据当前位置的天气数据显示，今天是晴天，气温在20-25度之间，非常适合外出活动。建议可以适当增加户外运动时间，注意防晒。'
           },
           {
             id: 2,
+            session_id: '550e8400-e29b-41d4-a716-446655440001',
             created_at: '2024-03-21 09:16:00',
             user_message: '那你给我推荐一些适合今天的户外活动吧',
             assistant_message: '考虑到今天的天气情况，我建议以下活动：\n1. 公园散步或慢跑\n2. 骑自行车郊游\n3. 野餐\n4. 户外摄影\n5. 打羽毛球\n\n这些活动都很适合现在的天气条件，既能享受阳光又不会太过剧烈。记得带足水和防晒用品！'
           },
           {
             id: 3,
+            session_id: '550e8400-e29b-41d4-a716-446655440002',
             created_at: '2024-03-21 09:17:00',
             user_message: '好主意！那我打算去野餐，你能帮我规划一下需要准备什么吗？',
             assistant_message: '当然可以！以下是野餐必备清单：\n\n必需品：\n- 野餐垫\n- 便携餐具\n- 纸巾和湿巾\n- 垃圾袋\n- 防晒用品\n- 便携小风扇\n\n食物建议：\n- 三明治\n- 水果\n- 饮料\n- 小零食\n\n记得选择阴凉的地方，避免正午时分出行哦！'
           },
           {
             id: 4,
+            session_id: '550e8400-e29b-41d4-a716-446655440003',
             created_at: '2024-03-21 14:30:00',
             user_message: '野餐很开心！现在我想了解一下附近有什么景点可以去看看',
             assistant_message: '很高兴你野餐愉快！让我为你推荐一些周边景点：\n\n1. 市中心公园 - 步行10分钟\n2. 艺术博物馆 - 驾车15分钟\n3. 滨江公园 - 步行20分钟\n4. 古城街区 - 驾车20分钟\n\n考虑到现在的时间，建议可以去滨江公园，那里傍晚的景色特别美！'
-          }
-          ,
+          },
           {
             id: 5,
+            session_id: '550e8400-e29b-41d4-a716-446655440004',
             created_at: '2024-03-21 16:45:00',
             user_message: '我想了解一下中国古代四大发明的历史，你能详细介绍一下吗？',
             assistant_message: '我很乐意为您介绍中国古代四大发明！\n\n1. 造纸术：\n- 起源于西汉，由蔡伦改进完善于东汉\n- 取代了竹简和丝帛，大大降低了书写材料的成本\n- 对文化传播和知识记录产生了革命性影响\n\n2. 指南针：\n- 最早出现于战国时期，称为"司南"\n- 宋代发展出指南针，用于航海导航\n- 促进了世界航海事业的发展，推动了地理大发现\n\n3. 火药：\n- 始于唐代炼丹术的意外发现\n- 最初用于烟花爆竹，后发展为军事用途\n- 改变了世界军事发展历程\n\n4. 活字印刷：\n- 北宋毕昇发明泥活字印刷\n- 元代王祯改进为木活字\n- 大大提高了印刷效率，促进了文化传播\n\n这些发明对人类文明发展产生了深远影响，至今仍被认为是中国对世界文明最重要的贡献之一。每一项发明都经历了漫长的发展过程，并在不同时期发挥了重要作用。\n\n您对哪一项发明特别感兴趣？我可以为您提供更详细的信息。'
@@ -384,6 +389,25 @@ export default {
   display: flex;
   flex-direction: column;
   background: #f5f7fa;
+}
+
+.panel-header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chat-time {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.session-id {
+  color: #999;
+  font-size: 0.9rem;
 }
 
 .messages-container {
