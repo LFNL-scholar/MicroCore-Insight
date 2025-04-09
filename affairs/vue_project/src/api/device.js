@@ -231,3 +231,148 @@ export async function deleteDevice(userId, macAddress) {
     handleApiError(error, 'deleteDevice')
   }
 }
+
+/**
+ * 获取音色列表
+ * @returns {Promise<Object>} - 音色列表
+ */
+export async function getVoiceList() {
+  try {
+    const response = await api.get('/api/frontend/device/voice')
+    
+    console.log('Get voice list response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '获取音色列表失败')
+  } catch (error) {
+    console.error('Get voice list error:', {
+      method: 'GET',
+      url: '/api/frontend/voice',
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'getVoiceList')
+  }
+}
+
+/**
+ * 配置设备角色信息
+ * @param {string} deviceId - 设备ID
+ * @param {string} name - 角色昵称
+ * @param {string} voice - 角色音色
+ * @param {string} prompt - 角色介绍
+ * @returns {Promise<Object>} - 配置结果
+ */
+export async function configureDeviceRole(deviceId, name, voice, prompt) {
+  try {
+    const response = await api.post('/api/frontend/device/role', {
+      device_4id: deviceId,
+      assistant_name: name,
+      assistant_voice: voice,
+      assistant_prompt: prompt
+    })
+    
+    console.log('Configure device role response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '配置角色失败')
+  } catch (error) {
+    console.error('Configure device role error:', {
+      method: 'POST',
+      url: '/api/frontend/device/role',
+      data: {
+        device_4id: deviceId,
+        assistant_name: name,
+        assistant_voice: voice,
+        assistant_prompt: prompt
+      },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+    
+    if (error.response?.status === 400) {
+      throw new Error('参数缺失，请检查输入')
+    }
+    
+    if (error.response?.status === 404) {
+      throw new Error('音色不存在，请重新选择')
+    }
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'configureDeviceRole')
+  }
+}
+
+/**
+ * 获取设备角色配置信息
+ * @param {string} deviceId - 设备ID
+ * @returns {Promise<Object>} - 角色配置信息
+ */
+export async function getDeviceRole(deviceId) {
+  try {
+    const response = await api.get('/api/frontend/device/get_role', {
+      params: {
+        device_4id: deviceId
+      }
+    })
+    
+    console.log('Get device role response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '获取角色配置失败')
+  } catch (error) {
+    console.error('Get device role error:', {
+      method: 'GET',
+      url: '/api/frontend/device/get_role',
+      params: { device_4id: deviceId },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+    
+    if (error.response?.status === 404) {
+      return {
+        status: 'not_found',
+        message: '角色信息不存在'
+      }
+    }
+    
+    if (error.response?.status === 400) {
+      throw new Error('参数缺失，请检查设备ID')
+    }
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'getDeviceRole')
+  }
+}
