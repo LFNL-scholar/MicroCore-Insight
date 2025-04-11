@@ -376,3 +376,53 @@ export async function getDeviceRole(deviceId) {
     handleApiError(error, 'getDeviceRole')
   }
 }
+
+/**
+ * 获取设备聊天记录
+ * @param {string} deviceId - 设备ID
+ * @returns {Promise<Object>} - 聊天记录
+ */
+export async function getDeviceChatHistory(deviceId) {
+  try {
+    const response = await api.get('/api/frontend/device/dialogue', {
+      params: {
+        device_4id: deviceId
+      }
+    })
+    
+    console.log('Get device chat history response:', response.data)
+    
+    if (response.data.status === 'success') {
+      return response.data
+    }
+    
+    throw new Error(response.data.message || '获取聊天记录失败')
+  } catch (error) {
+    console.error('Get device chat history error:', {
+      method: 'GET',
+      url: '/api/frontend/device/dialogue',
+      params: { device_4id: deviceId },
+      error: {
+        message: error.message,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        data: error.response?.data
+      }
+    })
+    
+    if (error.response?.status === 404) {
+      return {
+        status: 'not_found',
+        message: '无对话记录',
+        dialogue_count: 0,
+        dialogue_list: []
+      }
+    }
+    
+    if (error.response?.status === 500) {
+      throw new Error('服务器内部错误，请稍后重试')
+    }
+    
+    handleApiError(error, 'getDeviceChatHistory')
+  }
+}
