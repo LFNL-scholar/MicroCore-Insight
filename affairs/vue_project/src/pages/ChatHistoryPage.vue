@@ -38,10 +38,8 @@
                 @click="selectChat(chat)"
               >
                 <div class="conversation-time">{{ formatTime(chat.created_at) }}</div>
-                <div class="conversation-preview">
-                  <div class="preview-message">
-                    {{ chat.messages[chat.messages.length - 1]?.content || '无消息' }}
-                  </div>
+                <div class="preview-message">
+                  {{ chat.title || '未命名对话' }}
                 </div>
               </div>
             </div>
@@ -167,6 +165,7 @@ export default {
             id: index + 1,
             session_id: dialogue.session_id,
             created_at: dialogue.create_time,
+            title: dialogue.dialogue_title,
             messages: dialogue.message.filter(msg => msg.role !== 'system')
           }))
 
