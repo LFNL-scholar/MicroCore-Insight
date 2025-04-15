@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>镇江一日游行程规划表</title>
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #e8f4fc;
+            --border-color: #bde0f7;
+            --text-color: #2c3e50;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'ZCOOL XiaoWei', sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 210mm; /* A4 width */
+            min-height: 297mm; /* A4 height */
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            border-bottom: 2px solid var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+
+        .header-info {
+            display: flex;
+            justify-content: space-between;
+            color: var(--text-color);
+            margin: 10px 0;
+        }
+
+        .weather-info {
+            display: flex;
+            justify-content: space-between;
+            background: var(--secondary-color);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .schedule-table th {
+            background: var(--primary-color);
+            color: white;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .schedule-table td {
+            padding: 15px 10px;
+            border: 1px solid var(--border-color);
+            vertical-align: top;
+        }
+
+        .time-col {
+            width: 120px;
+            text-align: center;
+            background: var(--secondary-color);
+        }
+
+        .location-col {
+            width: 150px;
+        }
+
+        .details-col {
+            width: auto;
+        }
+
+        .notes-col {
+            width: 150px;
+        }
+
+        .transport-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--secondary-color);
+            border-radius: 5px;
+        }
+
+        .transport-route {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .transport-icon {
+            margin: 0 10px;
+            color: var(--primary-color);
+        }
+
+        .restaurant-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--secondary-color);
+            border-radius: 5px;
+        }
+
+        .restaurant-item {
+            margin: 10px 0;
+        }
+
+        .tips-section {
+            margin: 20px 0;
+            padding: 15px;
+            background: var(--secondary-color);
+            border-radius: 5px;
+        }
+
+        .emergency-contacts {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .rating {
+            color: #f1c40f;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>镇江一日游行程规划表</h1>
+            <div class="header-info">
+                <span>📅 2025年4月16日（星期三）</span>
+                <span>👤 旅行者：_______________</span>
+            </div>
+            <div class="weather-info">
+                <span>☀️ 白天：阴天，29℃</span>
+                <span>🌙 夜间：多云，17℃</span>
+                <span>🌪️ 西南风1-3级</span>
+            </div>
+        </div>
+
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>⏰ 时间</th>
+                    <th>📍 地点</th>
+                    <th>🎯 活动详情</th>
+                    <th>📝 备注</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="time-col">8:30-11:00</td>
+                    <td class="location-col">江苏科技大学<br>→<br>金山寺</td>
+                    <td class="details-col">
+                        • 金山寺游览<br>
+                        • 金山公园散步<br>
+                        • 白娘子爱情文化园<br>
+                        • 金山湖景区观光
+                    </td>
+                    <td class="notes-col">
+                        • 驾车约16分钟<br>
+                        • 距离：6.5公里
+                    </td>
+                </tr>
+                <tr>
+                    <td class="time-col">11:30-13:30</td>
+                    <td class="location-col">金山寺<br>→<br>西津渡古街</td>
+                    <td class="details-col">
+                        • 品尝镇江特色美食<br>
+                        • 游览西津渡历史文化街区<br>
+                        • 参观古渡口遗址
+                    </td>
+                    <td class="notes-col">
+                        • 驾车约8分钟<br>
+                        • 距离：2.3公里
+                    </td>
+                </tr>
+                <tr>
+                    <td class="time-col">14:00-16:30</td>
+                    <td class="location-col">西津渡古街<br>→<br>北固山</td>
+                    <td class="details-col">
+                        • 北固山公园游览<br>
+                        • 北固山题刻参观<br>
+                        • 长江景色观赏
+                    </td>
+                    <td class="notes-col">
+                        • 驾车约8分钟<br>
+                        • 距离：2.8公里
+                    </td>
+                </tr>
+                <tr>
+                    <td class="time-col">17:00-18:30</td>
+                    <td class="location-col">北固山<br>→<br>江苏科技大学</td>
+                    <td class="details-col">
+                        • 返程<br>
+                        • 途经市区可购买特产：<br>
+                        - 镇江香醋<br>
+                        - 镇江肴肉<br>
+                        - 特色茶叶
+                    </td>
+                    <td class="notes-col">
+                        • 驾车约18分钟<br>
+                        • 距离：8公里
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="restaurant-section">
+            <h3>🍽️ 餐饮推荐</h3>
+            <div class="restaurant-item">
+                <div>锅盖面 <span class="rating">⭐⭐⭐</span></div>
+                <div>镇江肴肉 <span class="rating">⭐⭐⭐⭐</span></div>
+                <div>醋排骨 <span class="rating">⭐⭐⭐⭐</span></div>
+            </div>
+        </div>
+
+        <div class="tips-section">
+            <h3>📌 实用提示</h3>
+            <ul>
+                <li>建议携带适量现金，部分商铺可能不支持移动支付</li>
+                <li>准备防晒用品和舒适的步行鞋</li>
+                <li>建议提前订购景点门票</li>
+                <li>注意保管随身物品</li>
+                <li>记得带充电宝</li>
+            </ul>
+        </div>
+
+        <div class="emergency-contacts">
+            <span>🏥 急救：120</span>
+            <span>👮 报警：110</span>
+            <span>🚒 火警：119</span>
+            <span>ℹ️ 旅游咨询：0511-84425001</span>
+        </div>
+    </div>
+</body>
+</html> 
