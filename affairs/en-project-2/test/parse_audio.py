@@ -23,7 +23,8 @@ def save_tts_audio(text, output_dir="output"):
     
     # 准备请求数据
     data = {
-        "text": text
+        "text": text,
+        "voice": "zh_female_wanwanxiaohe_moon_bigtts"
     }
     
     try:

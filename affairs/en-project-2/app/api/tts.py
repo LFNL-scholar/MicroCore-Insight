@@ -1,16 +1,14 @@
 from fastapi import HTTPException, APIRouter
 from schemas.tts_request import TTSRequest
 from services.tts_server import receive_tts_data
-from datetime import datetime
 import base64
 import os
 
 router = APIRouter()
 
-
 @router.post("/api/tts")
 async def receive_tts_request(tts_request: TTSRequest):
-    """接收并存储设备信息"""
+    """语音合成接口"""
     text = tts_request.text
     voice = tts_request.voice
 
@@ -30,7 +28,7 @@ async def receive_tts_request(tts_request: TTSRequest):
 
         return {
             "status": "success",
-            "message": "成功接收到TTS数据",
+            "message": "语音合成成功",
             "audio_data": audio_base64
         }
     
