@@ -12,15 +12,19 @@
 
 ### 请求参数
 
-| 参数名 | 类型   | 必填 | 描述         |
-|--------|--------|------|--------------|
-| text   | string | 是   | 要转换为语音的文本 |
+| 参数名 | 类型   | 必填 | 描述         | 限制 |
+|--------|--------|------|--------------|------|
+| text   | string | 是   | 要转换为语音的文本 | 不能为空，最大长度100字符 |
+| voice  | string | 是   | 语音音色 | 指定要使用的语音音色 |
+
+> 音色列表：https://www.volcengine.com/docs/6561/1257544
 
 ### 请求示例
 
 ```json
 {
-    "text": "你好，世界"
+    "text": "你好，世界",
+    "voice": "zh_female_wanwanxiaohe_moon_bigtts"
 }
 ```
 
@@ -48,20 +52,36 @@
 
 ```json
 {
-    "detail": "服务器内部错误: 错误详情"
+    "detail": "错误信息"
 }
 ```
 
-| HTTP 状态码 | 描述         |
-|-------------|--------------|
-| 200         | 请求成功     |
-| 500         | 服务器内部错误 |
+| HTTP 状态码 | 描述         | 可能的原因 |
+|-------------|--------------|------------|
+| 200         | 请求成功     | - |
+| 400         | 请求参数错误 | 文本为空或超过100字符 |
+| 500         | 服务器内部错误 | 服务器处理过程中发生异常 |
+
+### 错误示例
+
+```json
+{
+    "detail": "文本不能为空"
+}
+```
+
+```json
+{
+    "detail": "文本不能超过100个字符"
+}
+```
 
 ### 注意事项
 
 1. audio_data 字段包含 Base64 编码的 MP3 格式音频数据
 2. 客户端需要将 Base64 数据解码后才能播放或保存为音频文件
-3. 建议对较长文本进行分段处理，避免单次请求文本过长
+3. 文本长度限制为100个字符，超过会返回400错误
+4. 需要指定正确的语音音色（voice参数）
 
 ### 使用示例
 
@@ -69,7 +89,10 @@
 ```bash
 curl -X POST "http://localhost:8007/api/tts" \
      -H "Content-Type: application/json" \
-     -d '{"text": "你好，世界"}'
+     -d '{
+       "text": "你好，世界",
+       "voice": "zh_female_wanwanxiaohe_moon_bigtts"
+     }'
 ```
 
 #### Python
@@ -78,7 +101,10 @@ import requests
 import base64
 
 url = "http://localhost:8007/api/tts"
-data = {"text": "你好，世界"}
+data = {
+    "text": "你好，世界",
+    "voice": "zh_female_wanwanxiaohe_moon_bigtts"
+}
 
 response = requests.post(url, json=data)
 if response.status_code == 200:
@@ -87,4 +113,6 @@ if response.status_code == 200:
     # 保存为音频文件
     with open("output.mp3", "wb") as f:
         f.write(audio_data)
+else:
+    print(f"Error: {response.json()['detail']}")
 ```

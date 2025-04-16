@@ -12,15 +12,20 @@ router = APIRouter()
 async def receive_tts_request(tts_request: TTSRequest):
     """接收并存储设备信息"""
     text = tts_request.text
+    voice = tts_request.voice
+
+    if text == "":
+        raise HTTPException(status_code=400, detail="文本不能为空")
+    if len(text) > 100:
+        raise HTTPException(status_code=400, detail="文本不能超过100个字符")
+    
     try:
-        audio_file_path = await receive_tts_data(text)
-        
-        # Read the audio file and encode it as base64
+        audio_file_path = await receive_tts_data(text, voice)
+
         with open(audio_file_path, "rb") as audio_file:
             audio_data = audio_file.read()
             audio_base64 = base64.b64encode(audio_data).decode('utf-8')
-        
-        # Remove the temporary file after reading
+
         os.remove(audio_file_path)
 
         return {
@@ -29,6 +34,8 @@ async def receive_tts_request(tts_request: TTSRequest):
             "audio_data": audio_base64
         }
     
+    except HTTPException as he:
+        raise he
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"服务器内部错误: {str(e)}")
 

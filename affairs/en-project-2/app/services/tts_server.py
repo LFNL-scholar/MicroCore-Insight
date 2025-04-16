@@ -17,7 +17,6 @@ MESSAGE_COMPRESSIONS = {0: "no compression", 1: "gzip", 15: "custom compression 
 appid = "3827051297"
 token = "1aumAkgVPlD-psBioEY3vYj8Z8A4ILhF"
 cluster = "volcano_tts"
-voice_type = "zh_female_wanwanxiaohe_moon_bigtts"
 host = "openspeech.bytedance.com"
 api_url = f"wss://{host}/api/v1/tts/ws_binary"
 
@@ -40,7 +39,6 @@ request_json = {
         "uid": "388808087185088"
     },
     "audio": {
-        "voice_type": voice_type,
         "encoding": "mp3",
         "speed_ratio": 1.0,
         "volume_ratio": 1.0,
@@ -112,9 +110,9 @@ def parse_response(res, file):
         return True
 
 
-async def receive_tts_data(text):
+async def receive_tts_data(text, voice):
     query_request_json = copy.deepcopy(request_json)
-    query_request_json["audio"]["voice_type"] = voice_type
+    query_request_json["audio"]["voice_type"] = voice
     query_request_json["request"]["reqid"] = str(uuid.uuid4())
     query_request_json["request"]["operation"] = "query"
     query_request_json["request"]["text"] = text
