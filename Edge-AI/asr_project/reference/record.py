@@ -3,6 +3,15 @@ import opuslib
 import keyboard
 import threading
 import time
+import sys
+from pathlib import Path
+
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
+from config.logger import setup_logging
+
+TAG = __name__
+logger = setup_logging()
 
 # 音频参数
 SAMPLE_RATE = 16000
@@ -29,11 +38,11 @@ def check_microphone():
         default_input = p.get_default_input_device_info()
         if default_input['maxInputChannels'] > 0:
             has_microphone = True
-            print("✅ 找到可用的麦克风设备")
+            logger.bind(tag="TAG").info("✅ 找到可用的麦克风设备")
         else:
-            print("⚠️ 未找到可用的麦克风设备")
+            logger.bind(tag="TAG").info("⚠️ 未找到可用的麦克风设备")
     except:
-        print("⚠️ 未找到可用的麦克风设备")
+        logger.bind(tag="TAG").info("⚠️ 未找到可用的麦克风设备")
     finally:
         p.terminate()
 
@@ -43,7 +52,7 @@ def init_opus_encoder():
         encoder = opuslib.Encoder(SAMPLE_RATE, CHANNELS, OPUS_APPLICATION)
         return encoder
     except Exception as e:
-        print(f"❌ 初始化Opus编码器失败: {e}")
+        logger.bind(tag="TAG").info(f"❌ 初始化Opus编码器失败: {e}")
         return None
 
 def callback(in_data, frame_count, time_info, status):
@@ -54,7 +63,7 @@ def callback(in_data, frame_count, time_info, status):
             opus_data = opus_encoder.encode(in_data, frame_count)
             audio_frames.append(opus_data)
         except Exception as e:
-            print(f"❌ 音频编码出错: {e}")
+            logger.bind(tag="TAG").info(f"❌ 音频编码出错: {e}")
     return (in_data, pyaudio.paContinue)
 
 def start_recording():
@@ -62,7 +71,7 @@ def start_recording():
     global is_recording, stream, pa, opus_encoder, has_microphone
     
     if not has_microphone:
-        print("⚠️ 无法录音：没有可用的麦克风设备")
+        logger.bind(tag="TAG").info("⚠️ 无法录音：没有可用的麦克风设备")
         return
         
     if not is_recording:
@@ -83,9 +92,9 @@ def start_recording():
                 stream_callback=callback
             )
             stream.start_stream()
-            print("🎤 录音开始... (16kHz, 60ms/帧)")
+            logger.bind(tag="TAG").info("🎤 录音开始... (16kHz, 60ms/帧)")
         except Exception as e:
-            print(f"❌ 录音启动失败: {e}")
+            logger.bind(tag="TAG").info(f"❌ 录音启动失败: {e}")
             stop_recording()
 
 def stop_recording():
@@ -99,9 +108,9 @@ def stop_recording():
                 stream.close()
             if pa:
                 pa.terminate()
-            print(f"⏹️ 录音停止. 已保存 {len(audio_frames)} 个Opus数据块")
+            logger.bind(tag="TAG").info(f"⏹️ 录音停止. 已保存 {len(audio_frames)} 个Opus数据块")
         except Exception as e:
-            print(f"❌ 停止录音时出错: {e}")
+            logger.bind(tag="TAG").info(f"❌ 停止录音时出错: {e}")
 
 def monitor_space_key():
     """监听空格键状态"""
@@ -115,7 +124,7 @@ def monitor_space_key():
                     stop_recording()
             time.sleep(0.01)
         except Exception as e:
-            print(f"❌ 按键监听出错: {e}")
+            logger.bind(tag="TAG").info(f"❌ 按键监听出错: {e}")
             break
 
 if __name__ == "__main__":
@@ -123,7 +132,7 @@ if __name__ == "__main__":
     check_microphone()
     
     if has_microphone:
-        print("🔄 按住空格键开始录音，松开停止...")
+        logger.bind(tag="TAG").info("🔄 按住空格键开始录音，松开停止...")
         key_monitor_thread = threading.Thread(target=monitor_space_key)
         key_monitor_thread.daemon = True
         key_monitor_thread.start()
