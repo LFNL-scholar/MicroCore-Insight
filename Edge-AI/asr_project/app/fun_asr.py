@@ -54,7 +54,7 @@ class ASRProvider():
 
         return b"".join(pcm_data)
 
-    async def speech_to_text(self, opus_data: List[bytes], session_id: str) -> Tuple[Optional[str], Optional[str]]:
+    async def speech_to_text(self, opus_data: List[bytes], session_id: str) -> str:
         """语音转文本主处理逻辑"""
         try:
             # 解码Opus为PCM

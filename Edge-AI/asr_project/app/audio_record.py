@@ -1,5 +1,5 @@
 import pyaudio
-import opuslib
+import opuslib_next as opuslib
 import keyboard
 import threading
 import time
@@ -137,13 +137,19 @@ class AudioRecorder:
     def record_on_space(self):
         """空格键控制录音的线程方法"""
         try:
+            space_pressed = False
             while True:
                 if keyboard.is_pressed('space'):
-                    if not self.is_recording:
-                        self.start_recording()
+                    if not space_pressed:
+                        space_pressed = True
+                        if not self.is_recording:
+                            self.start_recording()
                 else:
-                    if self.is_recording:
-                        self.stop_recording()
+                    if space_pressed:
+                        space_pressed = False
+                        if self.is_recording:
+                            self.stop_recording()  # 数据会保留在self.audio_frames中
+                            self.logger.info("录音结束，等待处理...")
                 time.sleep(0.01)
         except Exception as e:
             self.logger.error(f"按键监听出错: {e}")
@@ -161,18 +167,3 @@ class AudioRecorder:
         )
         monitor_thread.start()
         return monitor_thread
-
-if __name__ == "__main__":
-    # 示例用法
-    recorder = AudioRecorder()
-    
-    if recorder.has_microphone:
-        monitor_thread = recorder.start_space_monitor()
-        try:
-            while True:
-                time.sleep(0.1)
-        except KeyboardInterrupt:
-            recorder.stop_recording()
-            print("\n🛑 程序退出")
-    else:
-        print("❌ 没有可用的麦克风设备，程序退出")
