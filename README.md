@@ -16,8 +16,3 @@
 ├── scripts/       # 工具脚本
 ├── README.md      # 项目说明
 ```
-
-## 联系
-- 如果你也想一起学习，研究，开发，欢迎加入我的群聊。
-
-<img src="docs/images/wechat.png" alt="微信二维码" width="300">
