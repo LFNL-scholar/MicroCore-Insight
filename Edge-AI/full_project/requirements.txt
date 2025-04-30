@@ -1,0 +1,9 @@
+# 基本依赖
+opuslib_next==1.1.2
+loguru==0.7.3
+keyboard==0.13.5
+
+# VAD 相关
+silero_vad==5.1.2
+
+
